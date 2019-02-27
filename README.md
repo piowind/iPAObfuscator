@@ -4,6 +4,8 @@ to Obfuscate iPA which contain bitcode， 是一款针对二进制的加固工�
 # useage
 python main.py  bctest -o bctest_new
 
+关于详细功能说明请阅读另外一个项目:
+https://github.com/godshield/iOSObfuscator
 # 注意事项
   目前只支持单架构的arm64的macho文件，还不支持fat file
 
