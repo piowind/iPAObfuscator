@@ -43,7 +43,7 @@ class Bitcode(XarFile):
           return filter(lambda x: x.find("file-type").text == type, self.toc.findall("file"))
 
       def getobf(self):
-          return ["-mllvm", "-bcf", "-mllvm", "-bcf_loop=2", "-mllvm", "-bcf_prob=30","-mllvm", "-fla","-mllvm", "-split", "-mllvm", "-split_num=2"]
+          return ["-mllvm", "-bcf", "-mllvm", "-bcf_loop=3", "-mllvm", "-bcf_prob=40","-mllvm", "-fla","-mllvm", "-split", "-mllvm", "-split_num=2"]
 
       def consObj(self, xmlNode):
           name = os.path.join(self.dir, xmlNode.find("name").text)
