@@ -47,16 +47,14 @@ class Bitcode(XarFile):
           return filter(lambda x: x.find("file-type").text == type, self.toc.findall("file"))
 
       def getobf(self):
-          return ["-mllvm", "-enable-bcfobf", "-mllvm", "-enable-strcry", "-mllvm", "-enable-splitobf"]
+          return ["-mllvm", "-bcf", "-mllvm", "-bcf_loop=2", "-mllvm", "-bcf_prob=30","-mllvm", "-fla","-mllvm", "-split", "-mllvm", "-split_num=1"]
 
       def consObj(self, xmlNode):
           name = os.path.join(self.dir, xmlNode.find("name").text)
           output = name + ".o"
           if xmlNode.find("clang") is not None:
             clang = Clang([name], [output])
-            options = ['-triple', 'arm64-apple-ios8.0.0', '-emit-obj', '-disable-llvm-optzns', '-target-abi', 'darwinpcs', '-Os']
-          if '-disable-llvm-passes' in options:
-              options.remove('-disable-llvm-passes')
+            options = ['-triple', 'arm64-apple-ios8.0.0', '-emit-obj', '-target-abi', 'darwinpcs']
           clang.addArgs(options)
           clang.addArgs(self.getobf())
           return clang
