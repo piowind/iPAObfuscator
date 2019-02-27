@@ -19,11 +19,7 @@ class XarFile(object):
         self.xml = ET.fromstring(retInfo.stdout)
         Extracmd = ["-x", "-C", self.dir, "-f", input]
         Xar(Extracmd).run()
-        cmd = ['/bin/chmod', "-R", "+r", self.dir]
-        try:
-            out = subprocess.check_output(cmd)
-        except subprocess.CalledProcessError:
-            print "error"
+
 
       @property
       def subdoc(self):
@@ -41,13 +37,13 @@ class Bitcode(XarFile):
           super(Bitcode, self).__init__(bundle)
 
           self.platform = "iPhoneOS"
-          self.sdk_version = "10.2.0"
+          self.sdk_version = env.SDK_VER
           self.version = "1.0"
       def getAllFiles(self, type):
           return filter(lambda x: x.find("file-type").text == type, self.toc.findall("file"))
 
       def getobf(self):
-          return ["-mllvm", "-bcf", "-mllvm", "-bcf_loop=2", "-mllvm", "-bcf_prob=30","-mllvm", "-fla","-mllvm", "-split", "-mllvm", "-split_num=1"]
+          return ["-mllvm", "-bcf", "-mllvm", "-bcf_loop=2", "-mllvm", "-bcf_prob=30","-mllvm", "-fla","-mllvm", "-split", "-mllvm", "-split_num=2"]
 
       def consObj(self, xmlNode):
           name = os.path.join(self.dir, xmlNode.find("name").text)
@@ -59,10 +55,9 @@ class Bitcode(XarFile):
           clang.addArgs(self.getobf())
           return clang
 
-      def run_J(self, job):
-           rv = job.run()
-           return rv
-      def run(self):
+      def doMore(self, works):
+           return works.run()
+      def doWork(self):
           l_inputs = []
           lin = Ld(self.output)
           lin.addArgs(["-arch", self.arch])
@@ -73,21 +68,18 @@ class Bitcode(XarFile):
 
           bitcodeBundle = map(self.consObj, bitcodefiles)
           l_inputs.extend(bitcodeBundle)
-
-          map(self.run_J,l_inputs)
-          inputs = sorted([os.path.basename(x.output[0]) for x in l_inputs])
+          map(self.doMore, l_inputs)
           LinkFileList = os.path.join(self.dir, self.output + ".LinkFileList")
           with open(LinkFileList, 'w') as f:
-             for i in inputs:
+             for i in [os.path.basename(x.output[0]) for x in l_inputs]:
                  f.write(os.path.join(self.dir, i))
                  f.write('\n')
           lin.addArgs(["-filelist", LinkFileList])
-          dylibs_node = self.subdoc.find("dylibs")
-          if dylibs_node is not None:
-             for lib_node in dylibs_node.iter():
-                 if lib_node.tag == "lib":
-                     lib_path = env.getDylibs(lib_node.text)
-                     lin.addArgs([lib_path])
-
-          retinfo = self.run_J(lin)
+          lin.addArgs([env.SDK + "/System/Library/Frameworks/Foundation.framework/Foundation.tbd"])
+          lin.addArgs([env.SDK + "/usr/lib/libobjc.A.tbd"])
+          lin.addArgs([env.SDK + "/usr/lib/libSystem.B.tbd"])
+          lin.addArgs([env.SDK + "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation.tbd"])
+          lin.addArgs([env.SDK + "/System/Library/Frameworks/UIKit.framework/UIKit.tbd"])
+          lin.addArgs([env.SDK + "/usr/lib/libobjc.A.tbd"])
+          retinfo = self.doMore(lin)
           return self

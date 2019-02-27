@@ -7,7 +7,10 @@ import tempfile
 
 class BuildEnv(object):
 
-    SDK = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.2.sdk"
+    SDK = subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], stderr=subprocess.STDOUT)
+    SDK = SDK.replace("\n", "")
+    SDK_VER = subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-version'], stderr=subprocess.STDOUT)
+    SDK_VER = SDK_VER.replace("\n", "")
     def __init__(self):
         self.platform = "iOS"
         self.sdk = BuildEnv.SDK
@@ -16,14 +19,4 @@ class BuildEnv(object):
     @staticmethod
     def creatTmpDir(Prefix=""):
         return tempfile.mkdtemp(prefix=Prefix)
-    def getDylibs(self, lib):
-
-        if lib.startswith("{SDKPATH}"):
-            lib =os.path.splitext(lib[9:])[0]
-            lib_path = self.sdk + lib
-            lib_path = os.path.join(os.path.dirname(lib_path), os.path.basename(lib_path))
-            lib_path = lib_path + ".tbd"
-            if os.path.isfile(lib_path):
-                return lib_path
-
 env = BuildEnv()
