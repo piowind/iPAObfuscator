@@ -11,8 +11,10 @@ python main.py  bctest -o bctest_new
 * 2.使用的混淆参数如下:
     -mllvm -bcf -mllvm -bcf_loop=3 -mllvm -bcf_prob=40 -mllvm-fla -mllvm -split -mllvm -split_num=2
 * 3.加固效果如下：
+
+
   加固前：
-  ![LOGO](https://github.com/godshield/iOSObfuscator/blob/master/logo.png)
+  ![LOGO](https://github.com/godshield/iPAObfuscator/blob/master/before.png)
 
   加固后:
-  ![LOGO](https://github.com/godshield/iOSObfuscator/blob/master/logo.png)
+  ![LOGO](https://github.com/godshield/iPAObfuscator/blob/master/after.png)
